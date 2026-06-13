@@ -44,6 +44,7 @@ async function loadRemoteState(): Promise<AppState | null> {
 
 /**
  * Load app state — local-first, optionally merged with Supabase cloud copy.
+ * @returns Decrypted application state or empty defaults
  */
 export async function loadState(): Promise<AppState> {
   if (typeof window === "undefined") return EMPTY_STATE;
@@ -73,6 +74,7 @@ async function saveStateLocalOnly(state: AppState): Promise<string> {
 
 /**
  * Persist app state locally and optionally sync encrypted blob to Supabase.
+ * @param state - Full application state to encrypt and store
  */
 export async function saveState(state: AppState): Promise<void> {
   if (typeof window === "undefined") return;
@@ -80,7 +82,7 @@ export async function saveState(state: AppState): Promise<void> {
   void pushToCloud(encrypted);
 }
 
-/** Delete all user data locally and in Supabase */
+/** Delete all user data locally and in Supabase (irreversible) */
 export async function deleteAllData(): Promise<void> {
   if (typeof window === "undefined") return;
   localStorage.removeItem(STORAGE_KEYS.ENCRYPTED_STATE);
@@ -89,7 +91,10 @@ export async function deleteAllData(): Promise<void> {
   clearDeviceId();
 }
 
-/** Save user profile after onboarding */
+/**
+ * Save user profile after onboarding.
+ * @param profile - Validated user profile with consent timestamp
+ */
 export async function saveProfile(profile: UserProfile): Promise<AppState> {
   const state = await loadLocalState();
   state.profile = profile;
@@ -97,7 +102,11 @@ export async function saveProfile(profile: UserProfile): Promise<AppState> {
   return state;
 }
 
-/** Add a journal entry */
+/**
+ * Add a reflective journal entry with mood pulse.
+ * @param content - Journal text (1–10,000 chars)
+ * @param mood - Mood level 1–5
+ */
 export async function addEntry(content: string, mood: JournalEntry["mood"]): Promise<AppState> {
   const state = await loadLocalState();
   const now = new Date().toISOString();

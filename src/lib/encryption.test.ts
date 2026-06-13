@@ -28,11 +28,14 @@ describe("device-id", () => {
   });
 
   it("creates and returns stable device id", async () => {
-    const { getOrCreateDeviceId } = await import("@/lib/storage/device-id");
+    const { getOrCreateDeviceId, clearDeviceId } = await import("@/lib/storage/device-id");
     const id1 = getOrCreateDeviceId();
     const id2 = getOrCreateDeviceId();
     expect(id1).toBe(id2);
     expect(id1).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    clearDeviceId();
+    const id3 = getOrCreateDeviceId();
+    expect(id3).not.toBe(id1);
   });
 });
 

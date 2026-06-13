@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { chatRequestSchema } from "@/lib/schemas";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { buildChatPrompt } from "@/features/ai/prompts/chat";
-import { detectCrisis, isAcuteCrisis } from "@/features/crisis/detector";
+import { defaultCrisisDetector } from "@/features/crisis/CrisisDetectorService";
 
 export const runtime = "nodejs";
 
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
 
   const { message, examType, userName, history, journalContext } = parsed.data;
 
-  const crisis = detectCrisis(message);
-  if (isAcuteCrisis(crisis)) {
+  const crisis = defaultCrisisDetector.detect(message);
+  if (defaultCrisisDetector.isAcute(crisis)) {
     return new Response(CRISIS_RESPONSE, {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });

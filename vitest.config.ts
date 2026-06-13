@@ -23,6 +23,7 @@ export default defineConfig({
         "src/lib/encryption.ts",
         "src/lib/storage/cloud-sync.ts",
         "src/lib/storage/device-id.ts",
+        "src/lib/storage/CloudSyncAdapter.ts",
         "src/lib/supabase/schemas.ts",
         "src/hooks/**",
         "src/components/journal/**",

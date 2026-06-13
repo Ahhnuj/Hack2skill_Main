@@ -4,6 +4,8 @@
 
 MindMirror goes beyond "rate your mood 1–5." It ingests open-ended journaling, runs GenAI pattern analysis to surface hidden stress triggers, and acts as an empathetic, always-available companion with crisis safety built in.
 
+See **[PROBLEM_ALIGNMENT.md](./PROBLEM_ALIGNMENT.md)** for the full requirement-to-implementation mapping.
+
 ---
 
 ## Quick Start
