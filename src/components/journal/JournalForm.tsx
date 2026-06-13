@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MoodSelector } from "@/components/journal/MoodSelector";
 import { CrisisBanner } from "@/components/crisis/CrisisBanner";
-import { detectCrisis, shouldShowCrisisBanner } from "@/features/crisis/detector";
+import { appServices } from "@/lib/di/services";
 import { validateJournalContent } from "@/features/journal/mood-parser";
 import { debounce } from "@/lib/utils";
 import type { MoodLevel } from "@/types";
@@ -17,19 +17,26 @@ interface JournalFormProps {
   initialMood?: MoodLevel;
 }
 
-/** Reflective journaling form with mood pulse and crisis detection */
+/**
+ * Reflective journaling form with mood pulse and crisis detection.
+ * @requirement Open-ended reflective journaling with crisis safety
+ * @param onSubmit - Async handler when user saves entry
+ * @param initialContent - Pre-filled journal text
+ * @param initialMood - Pre-selected mood pulse
+ * @returns Journal form with mood selector and crisis banner
+ */
 export function JournalForm({ onSubmit, initialContent = "", initialMood = 3 }: JournalFormProps) {
   const [content, setContent] = useState(initialContent);
   const [mood, setMood] = useState<MoodLevel>(initialMood);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
-  const [crisis, setCrisis] = useState(detectCrisis(initialContent));
+  const [crisis, setCrisis] = useState(appServices.crisisDetector.detect(initialContent));
 
   const debouncedCrisisCheck = useMemo(
     () =>
       debounce((text: string) => {
-        setCrisis(detectCrisis(text));
+        setCrisis(appServices.crisisDetector.detect(text));
         setDraftSaved(true);
         setTimeout(() => setDraftSaved(false), 2000);
       }, 500),
@@ -62,7 +69,7 @@ export function JournalForm({ onSubmit, initialContent = "", initialMood = 3 }: 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" aria-label="Journal entry form">
-      {shouldShowCrisisBanner(crisis) && (
+      {appServices.crisisDetector.shouldShowBanner(crisis) && (
         <CrisisBanner severity={crisis.severity === "acute" ? "acute" : "moderate"} />
       )}
 

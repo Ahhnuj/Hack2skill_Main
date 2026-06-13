@@ -40,7 +40,7 @@ interface MindfulnessEngineProps {
   distressLevel?: "low" | "moderate" | "high";
 }
 
-/** Adaptive micro-mindfulness exercises triggered by distress level */
+/** @requirement Micro-mindfulness interventions — distress-adaptive breathing */
 export function MindfulnessEngine({ distressLevel = "moderate" }: MindfulnessEngineProps) {
   const exerciseKey = distressLevel === "high" ? "grounding" : "calm";
   const exercise = EXERCISES[exerciseKey];

@@ -3,13 +3,9 @@
 import { memo, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import {
-  calculateBurnoutScore,
-  getBurnoutRiskLabel,
-  buildBurnoutTrend,
-} from "@/features/burnout/score";
+import { appServices } from "@/lib/di/services";
 import { MOOD_EMOJIS } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import { ariaNumber, formatDate } from "@/lib/utils";
 import type { JournalEntry, MirrorInsight } from "@/types";
 import { Sparkles, TrendingUp, AlertCircle } from "lucide-react";
 
@@ -36,16 +32,24 @@ interface DashboardProps {
   isGenerating: boolean;
 }
 
-/** Burnout Radar dashboard with Mirror Insights */
+/**
+ * Burnout Radar dashboard with Mirror Insights GenAI analysis.
+ * @requirement Burnout visualization + hidden stress trigger discovery
+ * @param entries - Journal history for scoring
+ * @param latestInsight - Most recent Mirror Insight or null
+ * @param onGenerateInsight - Callback to trigger GenAI analysis
+ * @param isGenerating - Whether insight API call is in flight
+ * @returns Dashboard layout with burnout cards, chart, and insight panel
+ */
 export const Dashboard = memo(function Dashboard({
   entries,
   latestInsight,
   onGenerateInsight,
   isGenerating,
 }: DashboardProps) {
-  const burnoutScore = useMemo(() => calculateBurnoutScore(entries), [entries]);
-  const risk = useMemo(() => getBurnoutRiskLabel(burnoutScore), [burnoutScore]);
-  const trendData = useMemo(() => buildBurnoutTrend(entries), [entries]);
+  const burnoutScore = useMemo(() => appServices.burnoutScorer.calculateScore(entries), [entries]);
+  const risk = useMemo(() => appServices.burnoutScorer.getRiskLabel(burnoutScore), [burnoutScore]);
+  const trendData = useMemo(() => appServices.burnoutScorer.buildTrend(entries), [entries]);
   const recentMood = entries[0]?.mood ?? 3;
 
   return (
@@ -56,7 +60,7 @@ export const Dashboard = memo(function Dashboard({
             <CardDescription>Burnout Radar</CardDescription>
             <CardTitle
               className={`text-3xl ${risk.color}`}
-              aria-label={`Burnout score ${burnoutScore} out of 100`}
+              aria-label={`Burnout score ${ariaNumber(burnoutScore, 100)} out of ${ariaNumber(100, 100)}`}
             >
               {burnoutScore}
               <span className="text-base font-normal text-slate-400">/100</span>
@@ -70,9 +74,14 @@ export const Dashboard = memo(function Dashboard({
         <Card role="region" aria-label="Latest mood summary">
           <CardHeader className="pb-2">
             <CardDescription>Latest Mood</CardDescription>
-            <CardTitle className="text-3xl" aria-label={`Latest mood level ${recentMood} of 5`}>
+            <CardTitle
+              className="text-3xl"
+              aria-label={`Latest mood level ${ariaNumber(recentMood, 5)} of ${ariaNumber(5, 5)}`}
+            >
               <span aria-hidden="true">{MOOD_EMOJIS[recentMood]}</span>
-              <span className="sr-only">Mood level {recentMood} of 5</span>
+              <span className="sr-only">
+                Mood level {ariaNumber(recentMood, 5)} of {ariaNumber(5, 5)}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>

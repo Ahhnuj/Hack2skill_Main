@@ -50,4 +50,18 @@ describe("isSupabaseConfigured", () => {
     expect(isSupabaseConfigured()).toBe(false);
     vi.unstubAllEnvs();
   });
+
+  it("returns true when URL and key are set", () => {
+    vi.stubEnv("SUPABASE_URL", "https://rfmpxoyauzwueoxleukf.supabase.co");
+    vi.stubEnv("SUPABASE_ANON_KEY", "test-key");
+    expect(isSupabaseConfigured()).toBe(true);
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("isSupabaseConnectivityError edge cases", () => {
+  it("detects econnrefused and etimedout", () => {
+    expect(isSupabaseConnectivityError({ message: "econnrefused" })).toBe(true);
+    expect(isSupabaseConnectivityError({ message: "etimedout" })).toBe(true);
+  });
 });

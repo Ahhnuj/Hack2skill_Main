@@ -9,17 +9,17 @@ describe("MoodSelector accessibility", () => {
     expect(screen.getByRole("radiogroup", { name: /mood level/i })).toBeInTheDocument();
   });
 
-  it("each mood button has aria-label", () => {
+  it("each mood button has zero-padded aria-label", () => {
     render(<MoodSelector value={3} onChange={() => {}} />);
-    expect(screen.getByRole("radio", { name: /mood 1/i })).toHaveAttribute("aria-label");
-    expect(screen.getByRole("radio", { name: /mood 5/i })).toHaveAttribute("aria-label");
+    expect(screen.getByRole("radio", { name: /mood 01/i })).toHaveAttribute("aria-label");
+    expect(screen.getByRole("radio", { name: /mood 05/i })).toHaveAttribute("aria-label");
   });
 
   it("calls onChange when mood selected", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<MoodSelector value={3} onChange={onChange} />);
-    await user.click(screen.getByRole("radio", { name: /mood 4/i }));
+    await user.click(screen.getByRole("radio", { name: /mood 04/i }));
     expect(onChange).toHaveBeenCalledWith(4);
   });
 });

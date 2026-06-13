@@ -16,7 +16,7 @@ interface BurnoutChartProps {
   data: BurnoutDataPoint[];
 }
 
-/** Accessible burnout trend chart */
+/** @requirement Burnout / wellness trajectory visualization */
 export function BurnoutChart({ data }: BurnoutChartProps) {
   const formatted = data.map((d) => ({
     ...d,

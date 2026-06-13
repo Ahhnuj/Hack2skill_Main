@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
 import Link from "next/link";
 
+/**
+ * Landing page — value proposition, Get Started, and Try Demo Mode.
+ * @requirement Demo mode without API keys + exam aspirant onboarding entry
+ * @see REQUIREMENTS.md#requirement-checklist rows 8, 11
+ */
 export default function HomePage() {
   const router = useRouter();
   const { state, isLoading } = useApp();
@@ -20,7 +25,11 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-violet-950">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-violet-950"
+        role="status"
+        aria-label="Loading MindMirror"
+      >
         <p className="text-slate-400" aria-live="polite">
           Loading MindMirror...
         </p>

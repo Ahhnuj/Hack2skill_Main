@@ -1,8 +1,10 @@
 import type {
   AppState,
   BurnoutDataPoint,
+  ChatMessage,
   CrisisDetectionResult,
   JournalEntry,
+  MirrorInsight,
   MoodLevel,
   UserProfile,
 } from "@/types";
@@ -25,6 +27,10 @@ export interface IStateRepository {
   saveProfile(profile: UserProfile): Promise<AppState>;
   /** Append a reflective journal entry with mood pulse */
   addEntry(content: string, mood: MoodLevel): Promise<AppState>;
+  /** Append a companion chat message to history */
+  appendChatMessage(message: ChatMessage): Promise<AppState>;
+  /** Prepend a Mirror Insight analysis result */
+  addInsight(insight: MirrorInsight): Promise<AppState>;
   /** Replace entire state (demo seeding) */
   replaceState(state: AppState): Promise<void>;
 }

@@ -26,7 +26,7 @@ describe("JournalForm", () => {
     render(<JournalForm onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/what's on your mind/i), "Good study day");
-    await user.click(screen.getByRole("radio", { name: /mood 4/i }));
+    await user.click(screen.getByRole("radio", { name: /mood 04/i }));
     await user.click(screen.getByRole("button", { name: /save journal entry/i }));
 
     await waitFor(() => {

@@ -88,8 +88,23 @@ describe("cloud sync fetch operations", () => {
     expect(fetch).toHaveBeenCalledWith("/api/sync", expect.objectContaining({ method: "DELETE" }));
   });
 
-  it("pushToCloud returns false when sync disabled", async () => {
-    vi.mocked(isCloudSyncEnabled).mockReturnValue(false);
+  it("pullFromCloud returns null on fetch throw", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("network"));
+    await expect(pullFromCloud()).resolves.toBeNull();
+  });
+
+  it("pushToCloud returns false on HTTP error", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({ ok: false } as Response);
     await expect(pushToCloud("blob")).resolves.toBe(false);
+  });
+
+  it("deleteFromCloud returns false when sync disabled", async () => {
+    vi.mocked(isCloudSyncEnabled).mockReturnValue(false);
+    await expect(deleteFromCloud()).resolves.toBe(false);
+  });
+
+  it("mergeAppState uses equal timestamps — prefers local", () => {
+    const state = baseState({ lastInsightAt: "2026-06-01T00:00:00.000Z" });
+    expect(mergeAppState(state, state)).toEqual(state);
   });
 });

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CrisisBanner } from "@/components/crisis/CrisisBanner";
 import { sanitizeText } from "@/lib/sanitize";
-import { detectCrisis, isAcuteCrisis } from "@/features/crisis/detector";
+import { appServices } from "@/lib/di/services";
 import { debounce } from "@/lib/utils";
 import type { ChatMessage, ExamType } from "@/types";
 import { Send, Loader2, Bot, User } from "lucide-react";
@@ -19,7 +19,16 @@ interface ChatInterfaceProps {
   onMessageAdded: (message: ChatMessage) => void;
 }
 
-/** Adaptive companion chat with streaming-style UX and crisis safety */
+/**
+ * Adaptive companion chat with streaming-style UX and crisis safety.
+ * @requirement Empathetic exam-aware AI companion with crisis safety
+ * @param examType - User's target exam for personalized prompts
+ * @param userName - Display name for chat personalization
+ * @param history - Prior chat messages
+ * @param onSend - Async API call to companion chat endpoint
+ * @param onMessageAdded - Persist message to encrypted storage
+ * @returns Chat UI with crisis banner and message list
+ */
 export const ChatInterface = memo(function ChatInterface({
   examType,
   userName,
@@ -29,13 +38,13 @@ export const ChatInterface = memo(function ChatInterface({
 }: ChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [crisis, setCrisis] = useState(detectCrisis(""));
+  const [crisis, setCrisis] = useState(appServices.crisisDetector.detect(""));
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const debouncedCrisisCheck = useMemo(
     () =>
       debounce((text: string) => {
-        setCrisis(detectCrisis(text));
+        setCrisis(appServices.crisisDetector.detect(text));
       }, 300),
     [],
   );
@@ -48,7 +57,7 @@ export const ChatInterface = memo(function ChatInterface({
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    const crisisCheck = detectCrisis(trimmed);
+    const crisisCheck = appServices.crisisDetector.detect(trimmed);
     setCrisis(crisisCheck);
 
     const userMsg: ChatMessage = {
@@ -63,7 +72,7 @@ export const ChatInterface = memo(function ChatInterface({
     setIsLoading(true);
 
     try {
-      if (isAcuteCrisis(crisisCheck)) {
+      if (appServices.crisisDetector.isAcute(crisisCheck)) {
         const crisisResponse: ChatMessage = {
           id: generateId(),
           role: "assistant",

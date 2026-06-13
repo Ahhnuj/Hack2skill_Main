@@ -15,7 +15,10 @@ import { appServices } from "@/lib/di/services";
 export const runtime = "nodejs";
 
 /**
- * GET /api/sync?deviceId= — pull encrypted state from Supabase
+ * GET /api/sync?deviceId= — pull encrypted state from Supabase.
+ * @requirement Optional encrypted cloud backup via Supabase
+ * @param request - Next.js request with deviceId query param
+ * @returns JSON with encryptedState and updatedAt
  */
 export async function GET(request: NextRequest) {
   const parsed = syncPullQuerySchema.safeParse({
@@ -61,7 +64,10 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/sync — push encrypted state to Supabase
+ * POST /api/sync — push encrypted state to Supabase.
+ * @requirement Optional encrypted cloud backup via Supabase
+ * @param request - JSON body with deviceId and encryptedState
+ * @returns JSON ok/synced status
  */
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -112,7 +118,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * DELETE /api/sync — remove cloud state for device
+ * DELETE /api/sync — remove cloud state for device.
+ * @requirement Sensitive delete — requires confirm:true in body
+ * @sensitive Irreversible cloud data deletion
+ * @param request - JSON body with deviceId and confirm:true
+ * @returns JSON ok/deleted status
  */
 export async function DELETE(request: NextRequest) {
   let body: unknown;

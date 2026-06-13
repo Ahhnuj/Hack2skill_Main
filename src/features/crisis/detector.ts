@@ -39,6 +39,7 @@ const ACUTE_KEYWORDS = [
 ];
 
 /**
+ * @requirement Crisis detection + Indian helplines
  * Detect crisis language in user journal or chat text.
  * Pure function — no side effects (Single Responsibility).
  * @param text - User-authored content to scan

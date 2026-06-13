@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/providers/AppProvider";
 import { AppShell } from "@/components/layout/AppShell";
-import { calculateBurnoutScore } from "@/features/burnout/score";
+import { appServices } from "@/lib/di/services";
 
 const MindfulnessEngine = dynamic(
   () => import("@/components/mindfulness/MindfulnessEngine").then((m) => m.MindfulnessEngine),
@@ -52,7 +52,7 @@ export default function MindfulnessPage() {
     );
   }
 
-  const burnoutScore = calculateBurnoutScore(state.entries);
+  const burnoutScore = appServices.burnoutScorer.calculateScore(state.entries);
   const distressLevel = burnoutScore >= 75 ? "high" : burnoutScore >= 50 ? "moderate" : "low";
 
   return (

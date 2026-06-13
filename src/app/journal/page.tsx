@@ -7,7 +7,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { JournalForm } from "@/components/journal/JournalForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MOOD_EMOJIS } from "@/lib/constants";
-import { formatDateTime } from "@/lib/utils";
+import { ariaNumber, formatDateTime } from "@/lib/utils";
 
 /**
  * Journal — reflective open-ended entries with mood pulse (1–5).
@@ -26,7 +26,11 @@ export default function JournalPage() {
 
   if (isLoading || !state.profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        role="status"
+        aria-label="Loading journal"
+      >
         <p className="text-slate-400" aria-live="polite">
           Loading...
         </p>
@@ -70,7 +74,9 @@ export default function JournalPage() {
                       <time className="text-xs text-slate-500" dateTime={entry.createdAt}>
                         {formatDateTime(entry.createdAt)}
                       </time>
-                      <span aria-label={`Mood ${entry.mood} of 5`}>{MOOD_EMOJIS[entry.mood]}</span>
+                      <span aria-label={`Mood ${ariaNumber(entry.mood, 5)} of ${ariaNumber(5, 5)}`}>
+                        {MOOD_EMOJIS[entry.mood]}
+                      </span>
                     </div>
                     <p className="text-sm text-slate-300 whitespace-pre-wrap">{entry.content}</p>
                   </CardContent>

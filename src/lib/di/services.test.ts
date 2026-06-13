@@ -18,6 +18,8 @@ describe("AppServices", () => {
       deleteAllData: async () => {},
       saveProfile: async () => mockState,
       addEntry: async () => mockState,
+      appendChatMessage: async () => mockState,
+      addInsight: async () => mockState,
       replaceState: async () => {},
     };
     const services = new AppServices({ stateRepository: mockRepo });

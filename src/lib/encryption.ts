@@ -1,5 +1,6 @@
 /**
  * Client-side encryption for journal data at rest using Web Crypto API (AES-GCM).
+ * @requirement Privacy-first encrypted local storage
  * Key is derived from a device-local salt — data stays on-device.
  */
 
@@ -59,6 +60,8 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
 
 /**
  * Encrypt plaintext string; returns base64(iv + ciphertext).
+ * @param plaintext - JSON or journal text to encrypt
+ * @returns Base64-encoded IV + ciphertext blob
  */
 export async function encrypt(plaintext: string): Promise<string> {
   const salt = getOrCreateSalt();
@@ -78,6 +81,8 @@ export async function encrypt(plaintext: string): Promise<string> {
 
 /**
  * Decrypt base64(iv + ciphertext) back to plaintext.
+ * @param encrypted - Blob from {@link encrypt}
+ * @returns Original plaintext string
  */
 export async function decrypt(encrypted: string): Promise<string> {
   const salt = getOrCreateSalt();

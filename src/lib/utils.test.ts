@@ -1,5 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
-import { generateId, debounce, formatDate, formatDateTime } from "@/lib/utils";
+import { generateId, debounce, formatDate, formatDateTime, ariaNumber } from "@/lib/utils";
+
+describe("ariaNumber", () => {
+  it("zero-pads mood values for accessible labels", () => {
+    expect(ariaNumber(3, 5)).toBe("03");
+    expect(ariaNumber(5, 5)).toBe("05");
+  });
+
+  it("zero-pads burnout scores to three digits", () => {
+    expect(ariaNumber(88, 100)).toBe("088");
+  });
+});
 
 describe("utils", () => {
   it("generateId returns a uuid string", () => {

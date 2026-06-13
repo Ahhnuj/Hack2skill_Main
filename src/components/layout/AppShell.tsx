@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
+/** @requirement Accessible main navigation for all students */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useApp();

@@ -9,6 +9,7 @@ interface CrisisBannerProps {
 }
 
 /** Surfaces verified Indian helplines when distress is detected */
+/** @requirement Crisis detection + Indian helplines (Tele-MANAS 14416) */
 export function CrisisBanner({ severity }: CrisisBannerProps) {
   return (
     <div

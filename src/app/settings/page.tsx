@@ -28,7 +28,11 @@ export default function SettingsPage() {
 
   if (isLoading || !state.profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        role="status"
+        aria-label="Loading settings"
+      >
         <p className="text-slate-400" aria-live="polite">
           Loading...
         </p>

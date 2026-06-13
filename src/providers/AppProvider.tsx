@@ -76,21 +76,16 @@ export function AppProvider({ children, repository }: AppProviderProps) {
 
   const addChatMessage = useCallback(
     async (message: ChatMessage) => {
-      const current = await repo.loadState();
-      current.chatHistory.push(message);
-      await repo.saveState(current);
-      setState({ ...current });
+      const updated = await repo.appendChatMessage(message);
+      setState(updated);
     },
     [repo],
   );
 
   const addInsight = useCallback(
-    async (message: MirrorInsight) => {
-      const current = await repo.loadState();
-      current.insights.unshift(message);
-      current.lastInsightAt = message.generatedAt;
-      await repo.saveState(current);
-      setState({ ...current });
+    async (insight: MirrorInsight) => {
+      const updated = await repo.addInsight(insight);
+      setState(updated);
     },
     [repo],
   );
@@ -105,6 +100,7 @@ export function AppProvider({ children, repository }: AppProviderProps) {
   );
 
   const clearAllData = useCallback(async () => {
+    /** @sensitive Irreversible wipe — only called after Settings two-step confirm */
     await repo.deleteAllData();
     setState({
       profile: null,

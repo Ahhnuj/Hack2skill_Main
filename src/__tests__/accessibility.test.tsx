@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import { axe } from "vitest-axe";
 import { CrisisBanner } from "@/components/crisis/CrisisBanner";
 import { MoodSelector } from "@/components/journal/MoodSelector";
+import { JournalForm } from "@/components/journal/JournalForm";
 import { AppShell } from "@/components/layout/AppShell";
 import { AppProvider } from "@/providers/AppProvider";
 
@@ -27,6 +28,12 @@ describe("accessibility (axe)", () => {
         </AppShell>
       </AppProvider>,
     );
+    const results = await axe(container);
+    expect(results.violations).toHaveLength(0);
+  });
+
+  it("JournalForm has no axe violations", async () => {
+    const { container } = render(<JournalForm onSubmit={async () => {}} />);
     const results = await axe(container);
     expect(results.violations).toHaveLength(0);
   });

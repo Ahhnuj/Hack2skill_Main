@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, ariaNumber } from "@/lib/utils";
 import type { MoodLevel } from "@/types";
 
 interface MoodOrbProps {
@@ -25,7 +25,7 @@ export function MoodOrb({ mood, size = "md", className }: MoodOrbProps) {
     <div
       className={cn("relative", SIZES[size], className)}
       role="img"
-      aria-label={`MindMirror mood orb showing mood level ${mood} of 5`}
+      aria-label={`MindMirror mood orb showing mood level ${ariaNumber(mood, 5)} of ${ariaNumber(5, 5)}`}
     >
       <div
         className={cn(

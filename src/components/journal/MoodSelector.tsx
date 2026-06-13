@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, ariaNumber } from "@/lib/utils";
 import { MOOD_EMOJIS, MOOD_LABELS } from "@/lib/constants";
 import type { MoodLevel } from "@/types";
 
@@ -10,21 +10,32 @@ interface MoodSelectorProps {
   disabled?: boolean;
 }
 
-/** Accessible mood pulse selector (1–5) */
+/**
+ * Accessible mood pulse selector (1–5).
+ * @requirement Mood pulse (1–5) alongside reflective journal text
+ * @param value - Currently selected mood level
+ * @param onChange - Callback when user selects a mood
+ * @param disabled - Whether selection is disabled during submit
+ * @returns Accessible fieldset with radio-style mood buttons
+ */
 export function MoodSelector({ value, onChange, disabled }: MoodSelectorProps) {
   const moods: MoodLevel[] = [1, 2, 3, 4, 5];
 
   return (
     <fieldset className="space-y-2" disabled={disabled}>
       <legend className="text-sm font-medium text-slate-300">How are you feeling right now?</legend>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Mood level from 1 to 5">
+      <div
+        className="flex flex-wrap gap-2"
+        role="radiogroup"
+        aria-label={`Mood level from ${ariaNumber(1, 5)} to ${ariaNumber(5, 5)}`}
+      >
         {moods.map((mood) => (
           <button
             key={mood}
             type="button"
             role="radio"
             aria-checked={value === mood}
-            aria-label={`Mood ${mood}: ${MOOD_LABELS[mood]}`}
+            aria-label={`Mood ${ariaNumber(mood, 5)}: ${MOOD_LABELS[mood]}`}
             disabled={disabled}
             onClick={() => onChange(mood)}
             className={cn(
