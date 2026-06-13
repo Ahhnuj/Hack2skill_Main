@@ -53,7 +53,7 @@ export async function deleteFromCloud(): Promise<boolean> {
     const res = await fetch("/api/sync", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ deviceId }),
+      body: JSON.stringify({ deviceId, confirm: true }),
     });
     return res.ok;
   } catch {

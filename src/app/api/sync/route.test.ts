@@ -28,10 +28,21 @@ describe("sync API route", () => {
     expect(res.status).toBe(400);
   });
 
+  it("DELETE rejects missing confirmation", async () => {
+    const req = new NextRequest("http://localhost/api/sync", {
+      method: "DELETE",
+      body: JSON.stringify({
+        deviceId: "550e8400-e29b-41d4-a716-446655440000",
+      }),
+    });
+    const res = await DELETE(req);
+    expect(res.status).toBe(400);
+  });
+
   it("DELETE rejects invalid deviceId", async () => {
     const req = new NextRequest("http://localhost/api/sync", {
       method: "DELETE",
-      body: JSON.stringify({ deviceId: "bad" }),
+      body: JSON.stringify({ deviceId: "bad", confirm: true }),
     });
     const res = await DELETE(req);
     expect(res.status).toBe(400);

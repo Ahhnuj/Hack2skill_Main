@@ -13,6 +13,11 @@ import type { ExamType } from "@/types";
 import { MoodOrb } from "@/components/layout/MoodOrb";
 import { cn } from "@/lib/utils";
 
+/**
+ * Onboarding — exam type selection, name, and informed consent.
+ * @requirement Exam-specific onboarding with consent
+ * @see REQUIREMENTS.md#requirement-checklist row 8
+ */
 export default function OnboardingPage() {
   const router = useRouter();
   const { setProfile, seedDemoData } = useApp();

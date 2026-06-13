@@ -2,17 +2,12 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import type { AppState, UserProfile, JournalEntry, ChatMessage, MirrorInsight } from "@/types";
-import {
-  loadState,
-  saveState,
-  deleteAllData,
-  addEntry as storageAddEntry,
-  saveProfile as storageSaveProfile,
-  replaceState,
-} from "@/lib/storage";
+import type { IStateRepository } from "@/lib/contracts";
+import { appServices } from "@/lib/di/services";
 import { isCloudSyncEnabled } from "@/lib/storage/device-id";
 import { createDemoState } from "@/lib/storage/seed-data";
 
+/** React context contract for global MindMirror state */
 interface AppContextValue {
   state: AppState;
   isLoading: boolean;
@@ -26,10 +21,22 @@ interface AppContextValue {
   refresh: () => Promise<void>;
 }
 
+interface AppProviderProps {
+  children: React.ReactNode;
+  /** Dependency Inversion: inject mock repository in tests */
+  repository?: IStateRepository;
+}
+
 const AppContext = createContext<AppContextValue | null>(null);
 
-/** Global app state provider — local-first storage with optional cloud sync */
-export function AppProvider({ children }: { children: React.ReactNode }) {
+/**
+ * Global app state provider — local-first storage with optional cloud sync.
+ * Uses {@link IStateRepository} via {@link appServices} (Dependency Inversion).
+ * @requirement Encrypted local storage + optional Supabase sync
+ */
+export function AppProvider({ children, repository }: AppProviderProps) {
+  const repo = repository ?? appServices.stateRepository;
+
   const [state, setState] = useState<AppState>({
     profile: null,
     entries: [],
@@ -40,9 +47,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const loaded = await loadState();
+    const loaded = await repo.loadState();
     setState(loaded);
-  }, []);
+  }, [repo]);
 
   useEffect(() => {
     void (async () => {
@@ -51,39 +58,54 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     })();
   }, [refresh]);
 
-  const setProfile = useCallback(async (profile: UserProfile) => {
-    const updated = await storageSaveProfile(profile);
-    setState(updated);
-  }, []);
+  const setProfile = useCallback(
+    async (profile: UserProfile) => {
+      const updated = await repo.saveProfile(profile);
+      setState(updated);
+    },
+    [repo],
+  );
 
-  const addJournalEntry = useCallback(async (content: string, mood: JournalEntry["mood"]) => {
-    const updated = await storageAddEntry(content, mood);
-    setState(updated);
-  }, []);
+  const addJournalEntry = useCallback(
+    async (content: string, mood: JournalEntry["mood"]) => {
+      const updated = await repo.addEntry(content, mood);
+      setState(updated);
+    },
+    [repo],
+  );
 
-  const addChatMessage = useCallback(async (message: ChatMessage) => {
-    const current = await loadState();
-    current.chatHistory.push(message);
-    await saveState(current);
-    setState({ ...current });
-  }, []);
+  const addChatMessage = useCallback(
+    async (message: ChatMessage) => {
+      const current = await repo.loadState();
+      current.chatHistory.push(message);
+      await repo.saveState(current);
+      setState({ ...current });
+    },
+    [repo],
+  );
 
-  const addInsight = useCallback(async (insight: MirrorInsight) => {
-    const current = await loadState();
-    current.insights.unshift(insight);
-    current.lastInsightAt = insight.generatedAt;
-    await saveState(current);
-    setState({ ...current });
-  }, []);
+  const addInsight = useCallback(
+    async (message: MirrorInsight) => {
+      const current = await repo.loadState();
+      current.insights.unshift(message);
+      current.lastInsightAt = message.generatedAt;
+      await repo.saveState(current);
+      setState({ ...current });
+    },
+    [repo],
+  );
 
-  const seedDemoData = useCallback(async (name?: string, examType?: UserProfile["examType"]) => {
-    const demo = createDemoState(name ?? "Demo Student", examType ?? "NEET");
-    await replaceState(demo);
-    setState(demo);
-  }, []);
+  const seedDemoData = useCallback(
+    async (name?: string, examType?: UserProfile["examType"]) => {
+      const demo = createDemoState(name ?? "Demo Student", examType ?? "NEET");
+      await repo.replaceState(demo);
+      setState(demo);
+    },
+    [repo],
+  );
 
   const clearAllData = useCallback(async () => {
-    await deleteAllData();
+    await repo.deleteAllData();
     setState({
       profile: null,
       entries: [],
@@ -91,7 +113,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       insights: [],
       lastInsightAt: null,
     });
-  }, []);
+  }, [repo]);
 
   const value = useMemo(
     () => ({
@@ -122,7 +144,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
-/** Access MindMirror app state and actions */
+/**
+ * Access MindMirror app state and actions.
+ * @throws Error when used outside {@link AppProvider}
+ */
 export function useApp(): AppContextValue {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used within AppProvider");

@@ -7,7 +7,10 @@ interface InsightRequest {
   userName: string;
 }
 
-/** React Query mutation for Mirror Insights — cached, deduped AI analysis */
+/**
+ * React Query mutation for Mirror Insights — cached, deduped GenAI analysis.
+ * @returns Mutation hook posting to `/api/ai/insights`
+ */
 export function useMirrorInsightMutation() {
   return useMutation({
     mutationKey: ["mirror-insight"],
@@ -23,7 +26,10 @@ export function useMirrorInsightMutation() {
   });
 }
 
-/** React Query mutation for companion chat messages */
+/**
+ * React Query mutation for streaming companion chat.
+ * @returns Mutation hook posting to `/api/ai/chat`
+ */
 export function useChatMutation() {
   return useMutation({
     mutationKey: ["companion-chat"],

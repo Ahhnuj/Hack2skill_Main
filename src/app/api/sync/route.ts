@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   createSupabaseAdmin,
   isSupabaseConfigured,
+  isSupabaseConnectivityError,
   SUPABASE_STATE_TABLE,
 } from "@/lib/supabase/admin";
 import {
@@ -9,7 +10,7 @@ import {
   syncPushBodySchema,
   syncDeleteBodySchema,
 } from "@/lib/supabase/schemas";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { appServices } from "@/lib/di/services";
 
 export const runtime = "nodejs";
 
@@ -28,8 +29,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ encryptedState: null, updatedAt: null });
   }
 
-  const ip = getClientIp(request.headers);
-  const rateLimit = checkRateLimit(`sync-get-${ip}`);
+  const ip = appServices.rateLimiter.getClientIp(request.headers);
+  const rateLimit = appServices.rateLimiter.check(`sync-get-${ip}`);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
@@ -47,6 +48,9 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error("Supabase pull error:", error);
+    if (isSupabaseConnectivityError(error)) {
+      return NextResponse.json({ encryptedState: null, updatedAt: null, syncUnavailable: true });
+    }
     return NextResponse.json({ error: "Sync failed" }, { status: 500 });
   }
 
@@ -76,8 +80,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, synced: false });
   }
 
-  const ip = getClientIp(request.headers);
-  const rateLimit = checkRateLimit(`sync-post-${ip}`);
+  const ip = appServices.rateLimiter.getClientIp(request.headers);
+  const rateLimit = appServices.rateLimiter.check(`sync-post-${ip}`);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
@@ -98,6 +102,9 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error("Supabase push error:", error);
+    if (isSupabaseConnectivityError(error)) {
+      return NextResponse.json({ ok: true, synced: false, syncUnavailable: true });
+    }
     return NextResponse.json({ error: "Sync failed" }, { status: 500 });
   }
 
@@ -124,8 +131,8 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ ok: true, deleted: false });
   }
 
-  const ip = getClientIp(request.headers);
-  const rateLimit = checkRateLimit(`sync-delete-${ip}`);
+  const ip = appServices.rateLimiter.getClientIp(request.headers);
+  const rateLimit = appServices.rateLimiter.check(`sync-delete-${ip}`);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Rate limit exceeded" },
@@ -145,6 +152,9 @@ export async function DELETE(request: NextRequest) {
 
   if (error) {
     console.error("Supabase delete error:", error);
+    if (isSupabaseConnectivityError(error)) {
+      return NextResponse.json({ ok: true, deleted: false, syncUnavailable: true });
+    }
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 

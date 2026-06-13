@@ -7,6 +7,11 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { useMirrorInsightMutation } from "@/hooks/useMirrorInsight";
 
+/**
+ * Dashboard — Burnout Radar + Mirror Insights (GenAI pattern analysis).
+ * @requirement Burnout visualization + hidden stress trigger discovery
+ * @see REQUIREMENTS.md#requirement-checklist rows 3, 5
+ */
 export default function DashboardPage() {
   const router = useRouter();
   const { state, isLoading, addInsight } = useApp();

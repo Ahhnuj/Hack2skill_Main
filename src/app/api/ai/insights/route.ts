@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { insightRequestSchema } from "@/lib/schemas";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { appServices } from "@/lib/di/services";
 import { buildInsightPrompt } from "@/features/ai/prompts/insights";
 import { parseInsightResponse, getDemoInsight } from "@/features/ai/parsers/insights";
 import { generateId } from "@/lib/utils";
@@ -9,12 +9,12 @@ import { generateId } from "@/lib/utils";
 export const runtime = "nodejs";
 
 /**
- * POST /api/ai/insights — Mirror Insights pattern analysis
- * Server-side only. Rate-limited. Zod-validated.
+ * POST /api/ai/insights — Mirror Insights GenAI pattern analysis.
+ * @requirement Hidden stress trigger discovery via GenAI
  */
 export async function POST(request: NextRequest) {
-  const ip = getClientIp(request.headers);
-  const rateLimit = checkRateLimit(ip);
+  const ip = appServices.rateLimiter.getClientIp(request.headers);
+  const rateLimit = appServices.rateLimiter.check(ip);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Rate limit exceeded. Please wait before trying again." },

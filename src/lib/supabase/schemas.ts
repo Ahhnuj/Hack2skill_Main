@@ -13,4 +13,6 @@ export const syncPushBodySchema = z.object({
 
 export const syncDeleteBodySchema = z.object({
   deviceId: deviceIdSchema,
+  /** Sensitive operation — explicit user confirmation required */
+  confirm: z.literal(true, { message: "Deletion requires confirm: true" }),
 });

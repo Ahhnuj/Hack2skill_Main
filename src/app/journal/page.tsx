@@ -9,6 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MOOD_EMOJIS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
 
+/**
+ * Journal — reflective open-ended entries with mood pulse (1–5).
+ * @requirement Open-ended journaling + mood tracking
+ * @see REQUIREMENTS.md#requirement-checklist rows 1, 2
+ */
 export default function JournalPage() {
   const router = useRouter();
   const { state, isLoading, addJournalEntry } = useApp();

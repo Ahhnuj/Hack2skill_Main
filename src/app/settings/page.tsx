@@ -10,6 +10,11 @@ import { CrisisBanner } from "@/components/crisis/CrisisBanner";
 import { DISCLAIMER } from "@/lib/constants";
 import { Trash2, Shield, Cloud } from "lucide-react";
 
+/**
+ * Settings — privacy disclosure, helplines, confirmed data deletion.
+ * @requirement Privacy controls + sensitive delete confirmation
+ * @see REQUIREMENTS.md#requirement-checklist rows 9, 13
+ */
 export default function SettingsPage() {
   const router = useRouter();
   const { state, isLoading, clearAllData, cloudSyncEnabled } = useApp();

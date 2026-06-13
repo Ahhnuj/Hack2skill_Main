@@ -39,8 +39,10 @@ const ACUTE_KEYWORDS = [
 ];
 
 /**
- * Detect crisis language in user text.
- * Pure function — no side effects.
+ * Detect crisis language in user journal or chat text.
+ * Pure function — no side effects (Single Responsibility).
+ * @param text - User-authored content to scan
+ * @returns Severity level and matched keywords for crisis UI
  */
 export function detectCrisis(text: string): CrisisDetectionResult {
   if (!text || text.trim().length === 0) {
@@ -69,12 +71,15 @@ export function detectCrisis(text: string): CrisisDetectionResult {
   return { detected: false, severity: "none", matchedKeywords: [] };
 }
 
-/** Whether crisis UI should be shown prominently */
+/** Whether crisis UI banner should be shown prominently */
 export function shouldShowCrisisBanner(result: CrisisDetectionResult): boolean {
   return result.detected && result.severity !== "none";
 }
 
-/** Whether to block AI and show helplines only */
+/**
+ * Whether to block AI and show helplines only (acute crisis).
+ * @param result - Output from {@link detectCrisis}
+ */
 export function isAcuteCrisis(result: CrisisDetectionResult): boolean {
   return result.severity === "acute";
 }

@@ -23,6 +23,11 @@ const MindfulnessEngine = dynamic(
   },
 );
 
+/**
+ * Micro-Mindfulness — adaptive breathing exercises based on distress level.
+ * @requirement Micro-mindfulness interventions
+ * @see REQUIREMENTS.md#requirement-checklist row 6
+ */
 export default function MindfulnessPage() {
   const router = useRouter();
   const { state, isLoading } = useApp();

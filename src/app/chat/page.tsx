@@ -25,6 +25,11 @@ const ChatInterface = dynamic(
   },
 );
 
+/**
+ * Companion Chat — empathetic exam-aware AI wellness companion.
+ * @requirement Empathetic exam-aware AI companion with crisis safety
+ * @see REQUIREMENTS.md#requirement-checklist row 4
+ */
 export default function ChatPage() {
   const router = useRouter();
   const { state, isLoading, addChatMessage } = useApp();

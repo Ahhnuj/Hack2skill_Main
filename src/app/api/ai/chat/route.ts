@@ -1,9 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { chatRequestSchema } from "@/lib/schemas";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { appServices } from "@/lib/di/services";
 import { buildChatPrompt } from "@/features/ai/prompts/chat";
-import { defaultCrisisDetector } from "@/features/crisis/CrisisDetectorService";
 
 export const runtime = "nodejs";
 
@@ -11,11 +10,12 @@ const CRISIS_RESPONSE =
   "I hear that you're going through something incredibly painful right now. I'm an AI companion — not a therapist. Please reach out to Tele-MANAS at 14416 (toll-free, 24/7), iCall at 9152987821, or AASRA at 9820466726. You matter, and real support is available.";
 
 /**
- * POST /api/ai/chat — Empathetic companion chat with streaming
+ * POST /api/ai/chat — Empathetic companion chat with streaming.
+ * @requirement Exam-aware companion chat with crisis safety layer
  */
 export async function POST(request: NextRequest) {
-  const ip = getClientIp(request.headers);
-  const rateLimit = checkRateLimit(`chat-${ip}`);
+  const ip = appServices.rateLimiter.getClientIp(request.headers);
+  const rateLimit = appServices.rateLimiter.check(`chat-${ip}`);
   if (!rateLimit.allowed) {
     return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
       status: 429,
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
 
   const { message, examType, userName, history, journalContext } = parsed.data;
 
-  const crisis = defaultCrisisDetector.detect(message);
-  if (defaultCrisisDetector.isAcute(crisis)) {
+  const crisis = appServices.crisisDetector.detect(message);
+  if (appServices.crisisDetector.isAcute(crisis)) {
     return new Response(CRISIS_RESPONSE, {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
